@@ -2,7 +2,7 @@
 //  GoogleMapDataSync.swift
 //  LocationTracker
 //
-//  Created by Annanovas IT on 28/12/23.
+//  Created byPartha Pratim on 28/12/23.
 //
 
 import Foundation
@@ -11,6 +11,7 @@ import UIKit
 class GoogleMapDataSync: NSObject{
     
     var locationDataModel: LocationDataModel?
+    var coordinateArray: [Payload] = [Payload]()
     
     var is_running : Bool = false
     var currentPage : Int = 1
@@ -41,10 +42,14 @@ class GoogleMapDataSync: NSObject{
                 do {
                     print(self.currentPage)
                     let decoder = JSONDecoder()
-                    print(data.description)
+                    let dataModel = try decoder.decode(LocationDataModel?.self, from: data)
+                    self.coordinateArray.removeAll()
+//                    self.coordinateArray = (dataModel?.payload)!
+                    self.coordinateArray.append(contentsOf: (dataModel?.payload)!)
                     DispatchQueue.main.async(execute: {
                         if let topController = appDelegate.mainViewController {
                             if (topController.isKind(of: GoogleMapViewController.self)){
+                                (topController).coordinateArray = self.coordinateArray
                                 (topController).reloadData()
                                 return
                             }
