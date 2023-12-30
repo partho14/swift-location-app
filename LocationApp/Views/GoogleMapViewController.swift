@@ -184,6 +184,7 @@ extension GoogleMapViewController: MKMapViewDelegate {
         let center = getCenterLocation(for: mapView)
         let region = MKCoordinateRegion.init(center: CLLocationCoordinate2D(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude), latitudinalMeters: regionInMeters, longitudinalMeters: regionInMeters)
         print(userLocation)
+        guard center.distance(from: CLLocation(latitude: destinationLat, longitude: destinationLng)) < 50 else { return }
         self.mapView.setRegion(region, animated: true)
         
     }
@@ -196,7 +197,7 @@ extension GoogleMapViewController: MKMapViewDelegate {
         
         let locationA = CLLocation(latitude: mostRecentLocation.coordinate.latitude, longitude: mostRecentLocation.coordinate.longitude)
 
-          
+          print(locationA)
           if UIApplication.shared.applicationState == .active {
             
               for coor in self.coordinateArray {
@@ -207,7 +208,7 @@ extension GoogleMapViewController: MKMapViewDelegate {
                   let distanceInMeters = locationA.distance(from: locationB)
                   
                   if distanceInMeters <= 50{
-                      let alert = UIAlertController(title: "Reached your Deestination", message: "\(coor.address!)", preferredStyle: UIAlertController.Style.alert)
+                      let alert = UIAlertController(title: "Reached your Deestination", message: "\(coor.message!)", preferredStyle: UIAlertController.Style.alert)
                       alert.addAction(UIAlertAction(title: "Ok", style: UIAlertAction.Style.default, handler: nil))
                       self.present(alert, animated: true, completion: nil)
                   } else { return }
@@ -221,7 +222,7 @@ extension GoogleMapViewController: MKMapViewDelegate {
                   let distanceInMeters = locationA.distance(from: locationB)
                   
                   if distanceInMeters <= 50{
-                      alertForUpdatingLocation("\(coor.address!)")
+                      alertForUpdatingLocation("\(coor.message!)")
                   } else { return }
               }
           }
