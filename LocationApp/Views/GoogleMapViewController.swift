@@ -206,12 +206,12 @@ extension GoogleMapViewController: MKMapViewDelegate {
                   
                   let locationB = CLLocation(latitude: dbLat!, longitude: dbLong!)
                   let distanceInMeters = locationA.distance(from: locationB)
-                  
+                  print("distance in meeter: \(distanceInMeters)")
                   if distanceInMeters <= 50{
                       let alert = UIAlertController(title: "Reached your Deestination", message: "\(coor.message!)", preferredStyle: UIAlertController.Style.alert)
                       alert.addAction(UIAlertAction(title: "Ok", style: UIAlertAction.Style.default, handler: nil))
                       self.present(alert, animated: true, completion: nil)
-                  } else { return }
+                  } else {  }
               }
           } else {
               for coor in self.coordinateArray {
@@ -222,8 +222,11 @@ extension GoogleMapViewController: MKMapViewDelegate {
                   let distanceInMeters = locationA.distance(from: locationB)
                   
                   if distanceInMeters <= 50{
-                      alertForUpdatingLocation("\(coor.message!)")
-                  } else { return }
+                      let distanceCross = locationA.distance(from: previousLocation!)
+                      if distanceCross >= 5{
+                          alertForUpdatingLocation("\(coor.message!)")
+                      }
+                  } else {  }
               }
           }
         }
