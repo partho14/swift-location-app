@@ -14,7 +14,7 @@ class GoogleMapViewController: UIViewController {
     
     @IBOutlet weak var mapView: MKMapView!
     let center = UNUserNotificationCenter.current()
-
+    var prefsArray : [LatLong] = []
     
     private lazy var locationManager: CLLocationManager = {
           let manager = CLLocationManager()
@@ -69,7 +69,7 @@ class GoogleMapViewController: UIViewController {
            
         //Create content
         let content = UNMutableNotificationContent()
-        content.title = "You Reached your Deestination"
+        content.title = "Alert!"
         content.body = locationData
         
         //create request
@@ -173,7 +173,7 @@ extension GoogleMapViewController: MKMapViewDelegate {
         
         guard self.previousLocation != nil else { return }
         let region = MKCoordinateRegion.init(center: CLLocationCoordinate2D(latitude: center.coordinate.latitude, longitude: center.coordinate.longitude), latitudinalMeters: regionInMeters, longitudinalMeters: regionInMeters)
-        guard center.distance(from: CLLocation(latitude: destinationLat, longitude: destinationLng)) < 50 else { return }
+        guard center.distance(from: CLLocation(latitude: destinationLat, longitude: destinationLng)) < 10 else { return }
         self.previousLocation = center
         self.mapView.setRegion(region, animated: true)
     }
@@ -184,7 +184,7 @@ extension GoogleMapViewController: MKMapViewDelegate {
         let center = getCenterLocation(for: mapView)
         let region = MKCoordinateRegion.init(center: CLLocationCoordinate2D(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude), latitudinalMeters: regionInMeters, longitudinalMeters: regionInMeters)
         print(userLocation)
-        guard center.distance(from: CLLocation(latitude: destinationLat, longitude: destinationLng)) < 50 else { return }
+        guard center.distance(from: CLLocation(latitude: destinationLat, longitude: destinationLng)) < 10 else { return }
         self.mapView.setRegion(region, animated: true)
         
     }
@@ -195,40 +195,95 @@ extension GoogleMapViewController: MKMapViewDelegate {
             return
           }
         
+        if let savedUsers = appDelegate.prefs.object(forKey: "locationLatLong") as? Data {
+            if let loadedUsers = try? JSONDecoder().decode([LatLong].self, from: savedUsers) {
+                print("Loaded users: \(loadedUsers)")
+                prefsArray.removeAll()
+                prefsArray = loadedUsers
+            }
+        }
+        
         let locationA = CLLocation(latitude: mostRecentLocation.coordinate.latitude, longitude: mostRecentLocation.coordinate.longitude)
-
+        
           print(locationA)
           if UIApplication.shared.applicationState == .active {
             
               for coor in self.coordinateArray {
-                  let dbLat = Double(coor.latitude!)  // Convert String to double
-                  let dbLong = Double(coor.longitude!)
                   
-                  let locationB = CLLocation(latitude: dbLat!, longitude: dbLong!)
-                  let distanceInMeters = locationA.distance(from: locationB)
-                  print("distance in meeter: \(distanceInMeters)")
-                  if distanceInMeters <= 50{
-                      let alert = UIAlertController(title: "Reached your Deestination", message: "\(coor.message!)", preferredStyle: UIAlertController.Style.alert)
-                      alert.addAction(UIAlertAction(title: "Ok", style: UIAlertAction.Style.default, handler: nil))
-                      self.present(alert, animated: true, completion: nil)
-                  } else {  }
+                  var locationFoundCheck = false
+                  
+                  for val in prefsArray{
+                      if(val.lat == coor.latitude && val.long == coor.longitude){
+                          locationFoundCheck = true
+                      }else{
+                          
+                      }
+                  }
+                  if(!locationFoundCheck){
+                      let dbLat = Double(coor.latitude!)  // Convert String to double
+                      let dbLong = Double(coor.longitude!)
+                      
+                      let locationB = CLLocation(latitude: dbLat!, longitude: dbLong!)
+                      let distanceInMeters = locationA.distance(from: locationB)
+                      print("distance in meeter: \(distanceInMeters)")
+                      if distanceInMeters <= 10{
+                          
+                          let distanceCross = locationA.distance(from: previousLocation!)
+                          //if distanceCross >= 5{
+                              let alert = UIAlertController(title: "Alert!", message: "\(coor.message!)", preferredStyle: UIAlertController.Style.alert)
+                              alert.addAction(UIAlertAction(title: "Ok", style: UIAlertAction.Style.default, handler: nil))
+                              self.present(alert, animated: true, completion: nil)
+                          //}
+                          
+                          let category = LatLong(lat: coor.latitude ?? "", long: coor.longitude ?? "")
+                          prefsArray.append(category)
+                          if let encoded = try? JSONEncoder().encode(prefsArray) {
+                              appDelegate.prefs.set(encoded, forKey: "locationLatLong")
+                          }
+                          
+                      } else {  }
+                  }
               }
           } else {
               for coor in self.coordinateArray {
-                  let dbLat = Double(coor.latitude!)  // Convert String to double
-                  let dbLong = Double(coor.longitude!)
+                  var locationFoundCheck = false
                   
-                  let locationB = CLLocation(latitude: dbLat!, longitude: dbLong!)
-                  let distanceInMeters = locationA.distance(from: locationB)
-                  
-                  if distanceInMeters <= 50{
-                      let distanceCross = locationA.distance(from: previousLocation!)
-                      if distanceCross >= 5{
-                          alertForUpdatingLocation("\(coor.message!)")
+                  for val in prefsArray{
+                      if(val.lat == coor.latitude && val.long == coor.longitude){
+                          locationFoundCheck = true
+                      }else{
+                          
                       }
-                  } else {  }
+                  }
+                  if(!locationFoundCheck){
+                      let dbLat = Double(coor.latitude!)  // Convert String to double
+                      let dbLong = Double(coor.longitude!)
+                      
+                      let locationB = CLLocation(latitude: dbLat!, longitude: dbLong!)
+                      let distanceInMeters = locationA.distance(from: locationB)
+                      
+                      if distanceInMeters <= 10{
+                    
+                          
+                          let distanceCross = locationA.distance(from: previousLocation!)
+                          //if distanceCross >= 5{
+                          alertForUpdatingLocation("\(coor.message!)")
+                          // }
+                          
+                          let category = LatLong(lat: coor.latitude ?? "", long: coor.longitude ?? "")
+                          prefsArray.append(category)
+                          if let encoded = try? JSONEncoder().encode(prefsArray) {
+                              appDelegate.prefs.set(encoded, forKey: "locationLatLong")
+                          }
+                          
+                      } else {  }
+                  }
               }
           }
         }
+}
 
+struct LatLong: Codable {
+    var lat: String
+    var long: String
 }

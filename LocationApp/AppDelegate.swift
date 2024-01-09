@@ -46,12 +46,32 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     let baseUrl = "https://businessautomata.com/inside-info/api/get/predefined/locations"
 
     var window: UIWindow?
-    
+    var todayDate = Date()
+    var toDate = ""
+
     var mainViewController: GoogleMapViewController?
     var currentNavicon: UINavigationController?
     var googleMaapDataSync: GoogleMapDataSync = GoogleMapDataSync.sharedInstance
+    
+    let prefs = UserDefaults.standard
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        
+        self.toDate = (prefs.value(forKey: "toDate") != nil) ? prefs.value(forKey: "toDate") as! String : ""
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeZone = TimeZone.current
+        dateFormatter.dateFormat = "dd-MM-yyyy"
+        let todayDateString = dateFormatter.string(from: self.todayDate)
+        
+        if(self.toDate == todayDateString){
+            print("true")
+        }else{
+            print("false")
+            prefs.setValue(todayDateString, forKey: "toDate")
+            prefs.removeObject(forKey: "locationLatLong")
+        }
+        
+
         let storyBoard = UIStoryboard(name: "Main", bundle: nil)
         self.mainViewController = storyBoard.instantiateViewController(withIdentifier: "GoogleMapViewController") as? GoogleMapViewController
         let navCon = UINavigationController.init(rootViewController: mainViewController!)
