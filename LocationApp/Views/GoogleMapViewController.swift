@@ -13,8 +13,18 @@ import UserNotifications
 class GoogleMapViewController: UIViewController {
     
     @IBOutlet weak var mapView: MKMapView!
+    @IBOutlet weak var latLongLbl: UILabel!
+    @IBOutlet weak var mainView: UIView!
+    @IBOutlet weak var latLongBtn: UIButton!{
+        didSet{
+            latLongBtn.layer.cornerRadius = 10
+        }
+    }
+    
+    
     let center = UNUserNotificationCenter.current()
     var prefsArray : [LatLong] = []
+    var mesureDistance: Double = 10
     
     private lazy var locationManager: CLLocationManager = {
           let manager = CLLocationManager()
@@ -27,6 +37,8 @@ class GoogleMapViewController: UIViewController {
         }()
     let regionInMeters: Double = 10000
     var previousLocation: CLLocation?
+    var latitude : String?
+    var longitude : String?
     
     let geoCoder = CLGeocoder()
     var directionsArray: [MKDirections] = []
@@ -39,6 +51,7 @@ class GoogleMapViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.mapView.backgroundColor = UIColor.white
         LoadingIndicatorView.show()
         mapView.showsUserLocation = true
         mapView.userTrackingMode = .follow
@@ -155,6 +168,11 @@ class GoogleMapViewController: UIViewController {
     }
     
     
+    @IBAction func latLongBtnClicked(_ sender: Any) {
+        self.latLongLbl.text = "Welcome to Inside Info\nYour Current Latitude is \(self.latitude!) and Longitude is \(self.longitude!)"
+    }
+    
+    
 }
 
 
@@ -173,7 +191,7 @@ extension GoogleMapViewController: MKMapViewDelegate {
         
         guard self.previousLocation != nil else { return }
         let region = MKCoordinateRegion.init(center: CLLocationCoordinate2D(latitude: center.coordinate.latitude, longitude: center.coordinate.longitude), latitudinalMeters: regionInMeters, longitudinalMeters: regionInMeters)
-        guard center.distance(from: CLLocation(latitude: destinationLat, longitude: destinationLng)) < 10 else { return }
+        guard center.distance(from: CLLocation(latitude: destinationLat, longitude: destinationLng)) < mesureDistance else { return }
         self.previousLocation = center
         self.mapView.setRegion(region, animated: true)
     }
@@ -184,7 +202,7 @@ extension GoogleMapViewController: MKMapViewDelegate {
         let center = getCenterLocation(for: mapView)
         let region = MKCoordinateRegion.init(center: CLLocationCoordinate2D(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude), latitudinalMeters: regionInMeters, longitudinalMeters: regionInMeters)
         print(userLocation)
-        guard center.distance(from: CLLocation(latitude: destinationLat, longitude: destinationLng)) < 10 else { return }
+        guard center.distance(from: CLLocation(latitude: destinationLat, longitude: destinationLng)) < mesureDistance else { return }
         self.mapView.setRegion(region, animated: true)
         
     }
@@ -204,6 +222,8 @@ extension GoogleMapViewController: MKMapViewDelegate {
         }
         
         let locationA = CLLocation(latitude: mostRecentLocation.coordinate.latitude, longitude: mostRecentLocation.coordinate.longitude)
+        latitude = "\(mostRecentLocation.coordinate.latitude)"
+        longitude = "\(mostRecentLocation.coordinate.longitude)"
         
           print(locationA)
           if UIApplication.shared.applicationState == .active {
@@ -226,7 +246,7 @@ extension GoogleMapViewController: MKMapViewDelegate {
                       let locationB = CLLocation(latitude: dbLat!, longitude: dbLong!)
                       let distanceInMeters = locationA.distance(from: locationB)
                       print("distance in meeter: \(distanceInMeters)")
-                      if distanceInMeters <= 10{
+                      if distanceInMeters <= coor.distance! {
                           
                           let distanceCross = locationA.distance(from: previousLocation!)
                           //if distanceCross >= 5{
@@ -262,7 +282,7 @@ extension GoogleMapViewController: MKMapViewDelegate {
                       let locationB = CLLocation(latitude: dbLat!, longitude: dbLong!)
                       let distanceInMeters = locationA.distance(from: locationB)
                       
-                      if distanceInMeters <= 10{
+                      if distanceInMeters <= coor.distance! {
                     
                           
                           let distanceCross = locationA.distance(from: previousLocation!)

@@ -44,7 +44,6 @@ class GoogleMapDataSync: NSObject{
                     let decoder = JSONDecoder()
                     let dataModel = try decoder.decode(LocationDataModel?.self, from: data)
                     self.coordinateArray.removeAll()
-//                    self.coordinateArray = (dataModel?.payload)!
                     self.coordinateArray.append(contentsOf: (dataModel?.payload)!)
                     DispatchQueue.main.async(execute: {
                         if let topController = appDelegate.mainViewController {
