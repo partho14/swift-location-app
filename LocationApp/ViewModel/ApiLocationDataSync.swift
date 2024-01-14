@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-class GoogleMapDataSync: NSObject{
+class ApiLocationDataSync: NSObject{
     
     var locationDataModel: LocationDataModel?
     var coordinateArray: [Payload] = [Payload]()
@@ -16,8 +16,8 @@ class GoogleMapDataSync: NSObject{
     var is_running : Bool = false
     var currentPage : Int = 1
     
-    static let sharedInstance: GoogleMapDataSync = {
-        let instance = GoogleMapDataSync()
+    static let sharedInstance: ApiLocationDataSync = {
+        let instance = ApiLocationDataSync()
         return instance
     }()
     
@@ -34,7 +34,6 @@ class GoogleMapDataSync: NSObject{
         
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             if error != nil {
-                LoadingIndicatorView.hide()
                 return
             }
             
@@ -47,7 +46,7 @@ class GoogleMapDataSync: NSObject{
                     self.coordinateArray.append(contentsOf: (dataModel?.payload)!)
                     DispatchQueue.main.async(execute: {
                         if let topController = appDelegate.mainViewController {
-                            if (topController.isKind(of: GoogleMapViewController.self)){
+                            if (topController.isKind(of: MainViewController.self)){
                                 (topController).coordinateArray = self.coordinateArray
                                 (topController).reloadData()
                                 return
@@ -57,7 +56,7 @@ class GoogleMapDataSync: NSObject{
                 } catch {
                     DispatchQueue.main.async(execute: {
                         if let topController = appDelegate.mainViewController {
-                            if (topController.isKind(of: GoogleMapViewController.self)){
+                            if (topController.isKind(of: MainViewController.self)){
                                 (topController).reloadData()
                                 return
                             }

@@ -49,9 +49,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var todayDate = Date()
     var toDate = ""
 
-    var mainViewController: GoogleMapViewController?
+    var mainViewController: MainViewController?
     var currentNavicon: UINavigationController?
-    var googleMaapDataSync: GoogleMapDataSync = GoogleMapDataSync.sharedInstance
+    var googleMaapDataSync: ApiLocationDataSync = ApiLocationDataSync.sharedInstance
     
     let prefs = UserDefaults.standard
 
@@ -73,7 +73,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
 
         let storyBoard = UIStoryboard(name: "Main", bundle: nil)
-        self.mainViewController = storyBoard.instantiateViewController(withIdentifier: "GoogleMapViewController") as? GoogleMapViewController
+        self.mainViewController = storyBoard.instantiateViewController(withIdentifier: "MainViewController") as? MainViewController
         let navCon = UINavigationController.init(rootViewController: mainViewController!)
         navCon.navigationBar.isHidden = true
         navCon.toolbar.isHidden = true

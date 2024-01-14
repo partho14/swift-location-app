@@ -10,7 +10,7 @@ import MapKit
 import CoreLocation
 import UserNotifications
 
-class GoogleMapViewController: UIViewController {
+class MainViewController: UIViewController {
     
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var latLongLbl: UILabel!
@@ -46,7 +46,7 @@ class GoogleMapViewController: UIViewController {
     let destinationLat = 23.75374625
     let destinationLng = 91.37823556
     
-    let viewModel = GoogleMapDataSync.sharedInstance
+    let viewModel = ApiLocationDataSync.sharedInstance
     
     var coordinateArray: [Payload] = [Payload]()
     
@@ -60,7 +60,6 @@ class GoogleMapViewController: UIViewController {
 //        mapView.isPitchEnabled = true
 //        mapView.showsBuildings = true
         
-        LoadingIndicatorView.show()
         let notificationCenter = NotificationCenter.default
         notificationCenter.addObserver(self, selector: #selector(appMovedToBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
         locationManager.startUpdatingLocation()
@@ -106,16 +105,6 @@ class GoogleMapViewController: UIViewController {
                 
                   for coor in self.coordinateArray {
                       
-                      var locationFoundCheck = false
-                      
-                      for val in prefsArray{
-                          if(val.lat == coor.latitude && val.long == coor.longitude){
-                              locationFoundCheck = true
-                          }else{
-                              
-                          }
-                      }
-                      //if(!locationFoundCheck){
                           let dbLat = Double(coor.latitude!)  // Convert String to double
                           let dbLong = Double(coor.longitude!)
                           
@@ -135,20 +124,10 @@ class GoogleMapViewController: UIViewController {
                               }
                               
                           } else {  }
-                      //}
                   }
               } else {
                   for coor in self.coordinateArray {
-                      var locationFoundCheck = false
-                      
-                      for val in prefsArray{
-                          if(val.lat == coor.latitude && val.long == coor.longitude){
-                              locationFoundCheck = true
-                          }else{
-                              
-                          }
-                      }
-                     // if(!locationFoundCheck){
+
                           let dbLat = Double(coor.latitude!)  // Convert String to double
                           let dbLong = Double(coor.longitude!)
                           
@@ -165,7 +144,6 @@ class GoogleMapViewController: UIViewController {
                               }
                               
                           } else {  }
-                     // }
                   }
               }
         }else{
@@ -212,10 +190,8 @@ class GoogleMapViewController: UIViewController {
     
     func checkLocationServices() {
         if CLLocationManager.locationServicesEnabled() {
-            LoadingIndicatorView.hide()
             checkLocationAuthorization()
         } else {
-            LoadingIndicatorView.hide()
             // Show alert letting the user know they have to turn this on.
         }
     }
@@ -244,7 +220,6 @@ class GoogleMapViewController: UIViewController {
     func startTackingUserLocation(){
         centerViewOnUserLocation()
         locationManager.startUpdatingLocation()
-        previousLocation = getCenterLocation(for: mapView)
     }
     
     
@@ -271,7 +246,7 @@ class GoogleMapViewController: UIViewController {
 }
 
 
-extension GoogleMapViewController: CLLocationManagerDelegate {
+extension MainViewController: CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         checkLocationAuthorization()

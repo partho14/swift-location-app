@@ -40,10 +40,10 @@
             </objects>
             <point key="canvasLocation" x="985" y="-27"/>
         </scene>
-        <!--GoogleMapViewController-->
+        <!--MainViewController-->
         <scene sceneID="eh6-yO-qso">
             <objects>
-                <viewController storyboardIdentifier="GoogleMapViewController" title="GoogleMapViewController" id="C23-wf-5fB" customClass="GoogleMapViewController" customModule="LocationApp" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="MainViewController" title="MainViewController" id="C23-wf-5fB" customClass="MainViewController" customModule="LocationApp" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="MSu-pQ-Fqr">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
