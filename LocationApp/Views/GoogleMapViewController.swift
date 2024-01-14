@@ -264,7 +264,7 @@ class GoogleMapViewController: UIViewController {
     
     
     @IBAction func latLongBtnClicked(_ sender: Any) {
-        self.latLongLbl.text = "Welcome to Inside Info\nYour Current Latitude is \(self.latitude!) and Longitude is \(self.longitude!)"
+        self.latLongLbl.text = "Welcome to Inside Info\nYour Current Latitude is \(self.latitude ?? "0") and Longitude is \(self.longitude ?? "0")"
     }
     
     
